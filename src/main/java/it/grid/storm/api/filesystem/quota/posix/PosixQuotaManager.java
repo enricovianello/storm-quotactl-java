@@ -8,20 +8,15 @@ import com.sun.jna.LastErrorException;
 import com.sun.jna.Native;
 import com.sun.jna.Structure;
 
-import it.grid.storm.api.filesystem.quota.QuotaException;
-import it.grid.storm.api.filesystem.quota.QuotaInfo;
-import it.grid.storm.api.filesystem.quota.QuotaInputData;
-import it.grid.storm.api.filesystem.quota.QuotaManager;
 import it.grid.storm.api.filesystem.quota.posix.CLibrary.T_dqblk;;
 
-public class PosixQuotaManager implements QuotaManager {
+public class PosixQuotaManager {
 	
 	private static final Logger log = LoggerFactory.getLogger(PosixQuotaManager.class);
 	
 	private static CLibrary cLib = (CLibrary) Native.loadLibrary("c", CLibrary.class);
 	
 	private static int GETQUOTA_CMD = 0x80000701;
-	private static int QIF_USAGE_BLIMITS = 3;
 	
 	private Structure quotactl(int cmd, String blockDevice, int id) throws LastErrorException {
 		
@@ -37,27 +32,19 @@ public class PosixQuotaManager implements QuotaManager {
 		return dablk;
 	}
 	
-	public QuotaInfo getQuotaInfo(QuotaInputData inputData) throws QuotaException {
+	public PosixQuotaInfo getQuotaInfo(String blockDevice, int gid) throws PosixQuotaException {
 		
-		log.debug("getQuotaInfo({})", inputData);
+		log.debug("PosixQuotaManager.getQuotaInfo({},{})", blockDevice, gid);
 		
-		Preconditions.checkNotNull(inputData, "Invalid null getQuotaInfo input data");
-		Preconditions.checkArgument(inputData instanceof PosixInputData, "Invalid getQuotaInfo input data type");
+		Preconditions.checkNotNull(blockDevice, "Invalid null blockDevice");
+		Preconditions.checkArgument(gid > 0, "Invalid gid value: %d", gid);
 		
-		PosixInputData pid = (PosixInputData) inputData;
-		T_dqblk dablk;
 		try {
-			dablk = (T_dqblk) quotactl(GETQUOTA_CMD, pid.getBlockDevice(), pid.getGid());
+			return new PosixQuotaInfo((T_dqblk) quotactl(GETQUOTA_CMD, blockDevice, gid));
 		} catch (LastErrorException e) {
 			log.error("quotactl failed with errno = {} and message: {}", e.getErrorCode(), e.getMessage());
-			throw new QuotaException(String.format("Unable to load quota information for device {} and gid {}", pid.getBlockDevice(), pid.getGid()), e);
+			throw new PosixQuotaException(String.format("Unable to load quota information for device {} and gid {}", blockDevice, gid), e);
 		}
-		/* check if returned value are valid */
-		if ((dablk.dqb_valid & QIF_USAGE_BLIMITS) != QIF_USAGE_BLIMITS) {
-			throw new QuotaException("getQuotaInfo: invalid blimits and usage values returned by quotactl!");
-		}
-		log.debug("getQuotaInfo: blimits and usage values are valid");
-		return new QuotaInfo(dablk.dqb_curspace, dablk.dqb_bhardlimit, dablk.dqb_bsoftlimit);		
 	}
 
 }

@@ -1,7 +1,8 @@
 package it.grid.storm.api.filesystem.quota;
 
-import it.grid.storm.api.filesystem.quota.posix.PosixInputData;
+import it.grid.storm.api.filesystem.quota.posix.PosixQuotaInfo;
 import it.grid.storm.api.filesystem.quota.posix.PosixQuotaManager;
+import it.grid.storm.api.filesystem.quota.posix.PosixQuotaException;
 
 public class Main {
 
@@ -10,10 +11,10 @@ public class Main {
 		int gid = 502;
 		String blockDevice = "/dev/disk/by-uuid/1d798f26-8ace-413f-9530-2d1d1d4fdbb5";
 		
-		QuotaInfo info = null;
+		PosixQuotaInfo info = null;
 		try {
-			info = (new PosixQuotaManager()).getQuotaInfo(new PosixInputData(blockDevice, gid));
-		} catch (QuotaException e) {
+			info = (new PosixQuotaManager()).getQuotaInfo(blockDevice, gid);
+		} catch (PosixQuotaException e) {
 			System.err.printf("Error: %s", e.getMessage());
 			e.printStackTrace();
 			return;

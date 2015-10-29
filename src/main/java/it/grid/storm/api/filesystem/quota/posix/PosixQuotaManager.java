@@ -62,7 +62,6 @@ public class PosixQuotaManager {
 			String errMsg = getErrnoMsg(e.getErrorCode());
 			String message = String.format("Unable to load quota information for device %s and gid %d: [%d] %s",
 					blockDevice, gid, errNo, errMsg);
-			log.error(message);
 			throw new PosixQuotaException(message, e);
 		}
 		

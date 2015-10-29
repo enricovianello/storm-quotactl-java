@@ -94,6 +94,7 @@ public class PosixQuotaManagerTest {
 
 		} catch (PosixQuotaException pqe) {
 
+			log.info(pqe.getMessage());
 			assertTrue(pqe.getCause() instanceof LastErrorException);
 			assertTrue(((LastErrorException) pqe.getCause()).getErrorCode() == errNo);
 			return;

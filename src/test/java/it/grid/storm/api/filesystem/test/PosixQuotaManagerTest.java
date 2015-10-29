@@ -126,120 +126,70 @@ public class PosixQuotaManagerTest {
 	@Test
 	public void testEFAULT() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm;
-		if (doLocalTests) {
-			pqm = new PosixQuotaManager();
-		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.EFAULT);
-		}
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.EFAULT);
 		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EFAULT);
 	}
 
 	@Test
 	public void testEINVAL() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm;
-		if (doLocalTests) {
-			pqm = new PosixQuotaManager();
-		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.EINVAL);
-		}
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.EINVAL);
 		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EINVAL);
 	}
 
 	@Test
 	public void testENOENT() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm;
-		if (doLocalTests) {
-			pqm = new PosixQuotaManager();
-		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOENT);
-		}
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOENT);
 		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOENT);
 	}
 
 	@Test
 	public void testENOSYS() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm;
-		if (doLocalTests) {
-			pqm = new PosixQuotaManager();
-		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOSYS);
-		}
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOSYS);
 		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOSYS);
 	}
 
 	@Test
 	public void testENOTBLK() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm;
-		if (doLocalTests) {
-			pqm = new PosixQuotaManager();
-		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOTBLK);
-		}
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOTBLK);
 		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOTBLK);
 	}
 
 	@Test
 	public void testEPERM() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm;
-		if (doLocalTests) {
-			pqm = new PosixQuotaManager();
-		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.EPERM);
-		}
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.EPERM);
 		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EPERM);
 	}
 
 	@Test
 	public void testESRCH() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm;
-		if (doLocalTests) {
-			pqm = new PosixQuotaManager();
-		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ESRCH);
-		}
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.ESRCH);
 		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ESRCH);
 	}
 	
 	@Test
 	public void testEIO() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm;
-		if (doLocalTests) {
-			pqm = new PosixQuotaManager();
-		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.EIO);
-		}
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.EIO);
 		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EIO);
 	}
 	
 	@Test
 	public void testEMFILE() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm;
-		if (doLocalTests) {
-			pqm = new PosixQuotaManager();
-		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.EMFILE);
-		}
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.EMFILE);
 		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EMFILE);
 	}
 
 	@Test
 	public void testENODEV() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm;
-		if (doLocalTests) {
-			pqm = new PosixQuotaManager();
-		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENODEV);
-		}
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.ENODEV);
 		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENODEV);
 	}
 	

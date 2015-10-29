@@ -55,6 +55,36 @@ public class PosixQuotaInfo {
 		return dablk.dqb_valid;
 	}
 
+	@Override
+	public String toString() {
+		return "PosixQuotaInfo [dablk=" + dablk + "]";
+	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((dablk == null) ? 0 : dablk.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PosixQuotaInfo other = (PosixQuotaInfo) obj;
+		if (dablk == null) {
+			if (other.dablk != null)
+				return false;
+		} else if (!dablk.equals(other.dablk))
+			return false;
+		return true;
+	}
+
+	
 	
 };

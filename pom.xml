@@ -7,33 +7,26 @@
 	<properties>
 		<!-- versions of the project dependencies -->
 		<jna.version>4.2.1</jna.version>
-		<guava.version>18.0</guava.version>
 		<junit.version>4.8.1</junit.version>
 		<mockito.version>1.9.5</mockito.version>
 		<slf4j.version>1.7.2</slf4j.version>
 		<logback.version>1.0.9</logback.version>
+		<!-- versions of maven plugins -->
+		<maven.shade.plugin>2.4.1</maven.shade.plugin>
+		<maven.surefire.plugin>2.19</maven.surefire.plugin>
+		<!-- JUnit test variables -->
+		<test.islocal>false</test.islocal>
+		<test.in.blockdevice>/dev/sdb1</test.in.blockdevice>
+		<test.in.gid>1003</test.in.gid>
+		<test.out.errno>0</test.out.errno>
+		<test.out.bhardlimit>1000</test.out.bhardlimit>
 	</properties>
 	<build>
 		<plugins>
 			<plugin>
-				<!-- Build an executable JAR -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>it.grid.storm.api.filesystem.quota.Main</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.1</version>
+				<version>${maven.shade.plugin}</version>
 				<configuration>
 					<!-- put your configurations here -->
 				</configuration>
@@ -46,8 +39,39 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven.surefire.plugin}</version>
+				<configuration>
+					<systemPropertyVariables>
+						<islocal>${test.islocal}</islocal>
+						<blockdevice>${test.in.blockdevice}</blockdevice>
+						<gid>${test.in.gid}</gid>
+						<errno>${test.out.errno}</errno>
+						<bhardlimit>${test.out.bhardlimit}</bhardlimit>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<test.islocal>false</test.islocal>
+			</properties>
+		</profile>
+		<profile>
+			<id>localtests</id>
+			<properties>
+				<test.islocal>true</test.islocal>
+			</properties>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -63,11 +87,6 @@
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
 			<version>${jna.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${guava.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>

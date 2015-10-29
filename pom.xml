@@ -57,7 +57,7 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>default</id>
+			<id>excludeLocalTests</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
@@ -66,7 +66,7 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>localtests</id>
+			<id>includeLocalTests</id>
 			<properties>
 				<test.islocal>true</test.islocal>
 			</properties>

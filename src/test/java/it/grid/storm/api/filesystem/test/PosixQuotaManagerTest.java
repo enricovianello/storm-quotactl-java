@@ -90,7 +90,7 @@ public class PosixQuotaManagerTest {
 
 		try {
 
-			pqm.getGroupQuota("/path/to/blockdevice", 500);
+			pqm.getGroupQuota("/path/to/blockdevice", gid);
 
 		} catch (PosixQuotaException pqe) {
 

@@ -178,9 +178,9 @@ public class PosixQuotaManagerTest {
 		if (doLocalTests) {
 			pqm = new PosixQuotaManager();
 		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOSYS);
+			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOTBLK);
 		}
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOSYS);
+		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOTBLK);
 	}
 
 	@Test
@@ -190,9 +190,9 @@ public class PosixQuotaManagerTest {
 		if (doLocalTests) {
 			pqm = new PosixQuotaManager();
 		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOSYS);
+			pqm = getMockedQuotaManagerFailsWith(CLibrary.EPERM);
 		}
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOSYS);
+		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EPERM);
 	}
 
 	@Test
@@ -202,9 +202,9 @@ public class PosixQuotaManagerTest {
 		if (doLocalTests) {
 			pqm = new PosixQuotaManager();
 		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOSYS);
+			pqm = getMockedQuotaManagerFailsWith(CLibrary.ESRCH);
 		}
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOSYS);
+		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ESRCH);
 	}
 	
 	@Test
@@ -214,9 +214,9 @@ public class PosixQuotaManagerTest {
 		if (doLocalTests) {
 			pqm = new PosixQuotaManager();
 		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOSYS);
+			pqm = getMockedQuotaManagerFailsWith(CLibrary.EIO);
 		}
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOSYS);
+		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EIO);
 	}
 	
 	@Test
@@ -226,9 +226,9 @@ public class PosixQuotaManagerTest {
 		if (doLocalTests) {
 			pqm = new PosixQuotaManager();
 		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOSYS);
+			pqm = getMockedQuotaManagerFailsWith(CLibrary.EMFILE);
 		}
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOSYS);
+		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EMFILE);
 	}
 
 	@Test
@@ -238,9 +238,9 @@ public class PosixQuotaManagerTest {
 		if (doLocalTests) {
 			pqm = new PosixQuotaManager();
 		} else {
-			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOSYS);
+			pqm = getMockedQuotaManagerFailsWith(CLibrary.ENODEV);
 		}
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOSYS);
+		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENODEV);
 	}
 	
 }

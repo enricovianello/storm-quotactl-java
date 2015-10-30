@@ -23,17 +23,17 @@ import it.grid.storm.api.filesystem.quota.posix.PosixQuotaException;
 import it.grid.storm.api.filesystem.quota.posix.PosixQuotaInfo;
 
 public class PosixQuotaManagerTest {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(PosixQuotaManagerTest.class);
-	
+
 	private static String FAKE_BLOCKDEVICE = "/dev/fake";
 	private static int FAKE_GID = 1000;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() {
-		
+
 	}
-	
+
 	static void setFinalStatic(Field field, Object newValue) throws Exception {
 
 		field.setAccessible(true);
@@ -42,9 +42,9 @@ public class PosixQuotaManagerTest {
 		modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 		field.set(null, newValue);
 	}
-	
+
 	private PosixQuotaManager getMockedQuotaManagerFailsWith(int errNo) {
-		
+
 		CLibrary mockedCLib = mock(CLibrary.class);
 		LastErrorException e = new LastErrorException("[" + errNo + "]");
 		Mockito.when(
@@ -58,20 +58,20 @@ public class PosixQuotaManagerTest {
 		}
 		return new PosixQuotaManager();
 	}
-	
-	private void checkQuotactlSuccess(PosixQuotaManager pqm, String blockDevice, int gid, PosixQuotaInfo expectedResult) {
 
-		PosixQuotaInfo pqi;
+	private PosixQuotaInfo checkQuotactlSuccess(PosixQuotaManager pqm, String blockDevice, int gid) {
+
+		PosixQuotaInfo pqi = null;
 		try {
 
 			pqi = pqm.getGroupQuota(blockDevice, gid);
 
 		} catch (PosixQuotaException pqe) {
 
+			log.error("PosixQuotaException: {} - {}", pqe.getMessage(), pqe.getCause());
 			fail("It shouldn't fail!");
-			return;
 		}
-		assertTrue(pqi.getBlockHardLimit() == expectedResult.getBlockHardLimit());
+		return pqi;
 	}
 
 	private void checkQuotactlFailWith(PosixQuotaManager pqm, String blockDevice, int gid, int errNo) {
@@ -93,18 +93,37 @@ public class PosixQuotaManagerTest {
 
 	@Test
 	@Category(LocalTests.class)
-	public void testSuccess() throws NoSuchFieldException, SecurityException, Exception {
-		
+	public void testLocalSuccess() throws NoSuchFieldException, SecurityException, Exception {
+
 		String blockdevice = "/dev/sdb";
 		int gid = 1002;
-		
-		CLibrary.T_dqblk dablk = new CLibrary.T_dqblk();
-		dablk.dqb_bhardlimit = 1000;
-		dablk.dqb_valid = PosixQuotaInfo.QIF_ALL;
-		checkQuotactlSuccess(new PosixQuotaManager(), blockdevice, gid, new PosixQuotaInfo(dablk));
 
+		PosixQuotaInfo pqi = checkQuotactlSuccess(new PosixQuotaManager(), blockdevice, gid);
+		
+		assertTrue(pqi.getBlockHardLimit() == 1000);
+		assertTrue(pqi.getValid() == PosixQuotaInfo.QIF_ALL);
 	}
 	
+	@Test
+	@Category(LocalTests.class)
+	public void testLocalFailureEPERM() throws NoSuchFieldException, SecurityException, Exception {
+
+		String blockdevice = "/dev/sdb";
+		int gid = 1000;
+
+		checkQuotactlFailWith(new PosixQuotaManager(), blockdevice, gid, ErrNo.ESRCH);
+	}
+	
+	@Test
+	@Category(LocalTests.class)
+	public void testLocalFailureENOTBLK() throws NoSuchFieldException, SecurityException, Exception {
+
+		String blockdevice = FAKE_BLOCKDEVICE;
+		int gid = 1000;
+
+		checkQuotactlFailWith(new PosixQuotaManager(), blockdevice, gid, ErrNo.ENOTBLK);
+	}
+
 	@Test
 	@Category(MockedTests.class)
 	public void testEFAULT() throws NoSuchFieldException, SecurityException, Exception {
@@ -160,7 +179,7 @@ public class PosixQuotaManagerTest {
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ESRCH);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ESRCH);
 	}
-	
+
 	@Test
 	@Category(MockedTests.class)
 	public void testEIO() throws NoSuchFieldException, SecurityException, Exception {
@@ -168,7 +187,7 @@ public class PosixQuotaManagerTest {
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EIO);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EIO);
 	}
-	
+
 	@Test
 	@Category(MockedTests.class)
 	public void testEMFILE() throws NoSuchFieldException, SecurityException, Exception {
@@ -184,5 +203,5 @@ public class PosixQuotaManagerTest {
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ENODEV);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENODEV);
 	}
-	
+
 }

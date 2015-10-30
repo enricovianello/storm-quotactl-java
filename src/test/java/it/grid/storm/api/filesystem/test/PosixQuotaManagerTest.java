@@ -29,14 +29,9 @@ public class PosixQuotaManagerTest {
 	private static String FAKE_BLOCKDEVICE = "/dev/fake";
 	private static int FAKE_GID = 1000;
 	
-	private static boolean doLocalTests = false;
-
 	@BeforeClass
 	public static void setUpBeforeClass() {
 		
-		doLocalTests = true;
-		//doLocalTests = Boolean.valueOf((String) System.getProperties().get("haslocal"));
-		log.debug("doLocalTests: {}", doLocalTests);
 	}
 	
 	static void setFinalStatic(Field field, Object newValue) throws Exception {
@@ -99,11 +94,6 @@ public class PosixQuotaManagerTest {
 	@Test
 	@Category(LocalTests.class)
 	public void testSuccess() throws NoSuchFieldException, SecurityException, Exception {
-
-		if (!doLocalTests) {
-			log.info("Local tests disabled");
-			return;
-		}
 		
 		String blockdevice = "/dev/sdb";
 		int gid = 1002;

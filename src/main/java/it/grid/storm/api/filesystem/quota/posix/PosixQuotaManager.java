@@ -20,25 +20,25 @@ public class PosixQuotaManager {
 
 		switch (errNo) {
 
-		case CLibrary.EFAULT:
+		case ErrNo.EFAULT:
 			return "addr or special is invalid.";
-		case CLibrary.EINVAL:
+		case ErrNo.EINVAL:
 			return "cmd or type is invalid.";
-		case CLibrary.ENOENT:
+		case ErrNo.ENOENT:
 			return "The file specified by special or addr does not exist.";
-		case CLibrary.ENOSYS:
+		case ErrNo.ENOSYS:
 			return "The kernel has not been compiled with the CONFIG_QUOTA option.";
-		case CLibrary.ENOTBLK:
+		case ErrNo.ENOTBLK:
 			return "special is not a block device.";
-		case CLibrary.EPERM:
+		case ErrNo.EPERM:
 			return "The caller lacked the required privilege (CAP_SYS_ADMIN) for the specified operation.";
-		case CLibrary.ESRCH:
+		case ErrNo.ESRCH:
 			return "No disk quota is found for the indicated user. Quotas have not been turned on for this filesystem.";
-		case CLibrary.EIO:
+		case ErrNo.EIO:
 			return "Cannot read or write the quota file.";
-		case CLibrary.EMFILE:
+		case ErrNo.EMFILE:
 			return "Too many open files: cannot open quota file.";
-		case CLibrary.ENODEV:
+		case ErrNo.ENODEV:
 			return "special cannot be found in the mount table.";
 		default:
 			return "Unrecognized error " + errNo + " !";

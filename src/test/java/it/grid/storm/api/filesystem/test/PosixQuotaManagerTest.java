@@ -8,6 +8,7 @@ import java.lang.reflect.Modifier;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import com.sun.jna.LastErrorException;
 import com.sun.jna.Structure;
 
 import it.grid.storm.api.filesystem.quota.posix.CLibrary;
+import it.grid.storm.api.filesystem.quota.posix.ErrNo;
 import it.grid.storm.api.filesystem.quota.posix.PosixQuotaManager;
 import it.grid.storm.api.filesystem.quota.posix.PosixQuotaException;
 import it.grid.storm.api.filesystem.quota.posix.PosixQuotaInfo;
@@ -24,26 +26,17 @@ public class PosixQuotaManagerTest {
 	
 	private static final Logger log = LoggerFactory.getLogger(PosixQuotaManagerTest.class);
 	
+	private static String FAKE_BLOCKDEVICE = "/dev/fake";
+	private static int FAKE_GID = 1000;
+	
 	private static boolean doLocalTests = false;
-	private static String blockDevice = "/dev/sdb1";
-	private static int gid = 1003;
-	private static int expectedErrNo = 0;
-	private static long expectedBlockHardLimit = 1000;
 
 	@BeforeClass
 	public static void setUpBeforeClass() {
 		
-		doLocalTests = Boolean.valueOf((String) System.getProperties().get("islocal"));
-		blockDevice = (String) System.getProperties().get("blockdevice");
-		gid = Integer.valueOf((String) System.getProperties().get("gid"));
-		expectedErrNo = Integer.valueOf((String) System.getProperties().get("errno"));
-		expectedBlockHardLimit = Long.valueOf((String) System.getProperties().get("bhardlimit"));
-		
+		doLocalTests = true;
+		//doLocalTests = Boolean.valueOf((String) System.getProperties().get("haslocal"));
 		log.debug("doLocalTests: {}", doLocalTests);
-		log.debug("blockDevice: {}", blockDevice);
-		log.debug("gid: {}", gid);
-		log.debug("expectedErrNo: {}", expectedErrNo);
-		log.debug("expectedBlockHardLimit: {}", expectedBlockHardLimit);
 	}
 	
 	static void setFinalStatic(Field field, Object newValue) throws Exception {
@@ -104,6 +97,7 @@ public class PosixQuotaManagerTest {
 	}
 
 	@Test
+	@Category(LocalTests.class)
 	public void testSuccess() throws NoSuchFieldException, SecurityException, Exception {
 
 		if (!doLocalTests) {
@@ -111,87 +105,94 @@ public class PosixQuotaManagerTest {
 			return;
 		}
 		
-		if (expectedErrNo == 0) {
-			
-			CLibrary.T_dqblk dablk = new CLibrary.T_dqblk();
-			dablk.dqb_bhardlimit = expectedBlockHardLimit;
-			dablk.dqb_valid = PosixQuotaInfo.QIF_ALL;
-			checkQuotactlSuccess(new PosixQuotaManager(), blockDevice, gid, new PosixQuotaInfo(dablk));
+		String blockdevice = "/dev/sdb";
+		int gid = 1002;
 		
-		} else {
-		
-			checkQuotactlFailWith(new PosixQuotaManager(), blockDevice, gid, expectedErrNo);
-		}
+		CLibrary.T_dqblk dablk = new CLibrary.T_dqblk();
+		dablk.dqb_bhardlimit = 1000;
+		dablk.dqb_valid = PosixQuotaInfo.QIF_ALL;
+		checkQuotactlSuccess(new PosixQuotaManager(), blockdevice, gid, new PosixQuotaInfo(dablk));
+
 	}
 	
 	@Test
+	@Category(MockedTests.class)
 	public void testEFAULT() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.EFAULT);
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EFAULT);
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EFAULT);
+		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EFAULT);
 	}
 
 	@Test
+	@Category(MockedTests.class)
 	public void testEINVAL() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.EINVAL);
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EINVAL);
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EINVAL);
+		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EINVAL);
 	}
 
 	@Test
+	@Category(MockedTests.class)
 	public void testENOENT() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOENT);
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOENT);
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ENOENT);
+		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENOENT);
 	}
 
 	@Test
+	@Category(MockedTests.class)
 	public void testENOSYS() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOSYS);
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOSYS);
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ENOSYS);
+		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENOSYS);
 	}
 
 	@Test
+	@Category(MockedTests.class)
 	public void testENOTBLK() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.ENOTBLK);
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENOTBLK);
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ENOTBLK);
+		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENOTBLK);
 	}
 
 	@Test
+	@Category(MockedTests.class)
 	public void testEPERM() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.EPERM);
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EPERM);
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EPERM);
+		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EPERM);
 	}
 
 	@Test
+	@Category(MockedTests.class)
 	public void testESRCH() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.ESRCH);
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ESRCH);
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ESRCH);
+		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ESRCH);
 	}
 	
 	@Test
+	@Category(MockedTests.class)
 	public void testEIO() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.EIO);
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EIO);
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EIO);
+		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EIO);
 	}
 	
 	@Test
+	@Category(MockedTests.class)
 	public void testEMFILE() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.EMFILE);
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.EMFILE);
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EMFILE);
+		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EMFILE);
 	}
 
 	@Test
+	@Category(MockedTests.class)
 	public void testENODEV() throws NoSuchFieldException, SecurityException, Exception {
 
-		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(CLibrary.ENODEV);
-		checkQuotactlFailWith(pqm, blockDevice, gid, CLibrary.ENODEV);
+		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ENODEV);
+		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENODEV);
 	}
 	
 }

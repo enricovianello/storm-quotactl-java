@@ -15,11 +15,6 @@
 		<!-- versions of maven plugins -->
 		<maven.surefire.plugin>2.19</maven.surefire.plugin>
 		<!-- JUnit test variables -->
-		<test.islocal>false</test.islocal>
-		<test.in.blockdevice>/dev/sdb1</test.in.blockdevice>
-		<test.in.gid>1003</test.in.gid>
-		<test.out.errno>0</test.out.errno>
-		<test.out.bhardlimit>1000</test.out.bhardlimit>
 	</properties>
 	<build>
 		<plugins>
@@ -28,13 +23,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven.surefire.plugin}</version>
 				<configuration>
-					<systemPropertyVariables>
-						<islocal>${test.islocal}</islocal>
-						<blockdevice>${test.in.blockdevice}</blockdevice>
-						<gid>${test.in.gid}</gid>
-						<errno>${test.out.errno}</errno>
-						<bhardlimit>${test.out.bhardlimit}</bhardlimit>
-					</systemPropertyVariables>
+					<groups>${test.categories}</groups>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -46,13 +35,13 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<test.islocal>false</test.islocal>
+				<test.categories>it.grid.storm.api.filesystem.test.MockedTests</test.categories>
 			</properties>
 		</profile>
 		<profile>
 			<id>includeLocalTests</id>
 			<properties>
-				<test.islocal>true</test.islocal>
+				<test.categories>it.grid.storm.api.filesystem.test.LocalTests,it.grid.storm.api.filesystem.test.MockedTests</test.categories>
 			</properties>
 		</profile>
 	</profiles>

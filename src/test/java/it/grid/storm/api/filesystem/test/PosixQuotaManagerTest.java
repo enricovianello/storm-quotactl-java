@@ -111,7 +111,7 @@ public class PosixQuotaManagerTest {
 		String blockdevice = "/dev/sdb";
 		int gid = 1000;
 
-		checkQuotactlFailWith(new PosixQuotaManager(), blockdevice, gid, ErrNo.ESRCH);
+		checkQuotactlFailWith(new PosixQuotaManager(), blockdevice, gid, ErrNo.EPERM);
 	}
 	
 	@Test

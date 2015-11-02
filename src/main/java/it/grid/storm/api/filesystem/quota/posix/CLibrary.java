@@ -5,11 +5,44 @@ import java.util.List;
 
 import com.sun.jna.LastErrorException;
 import com.sun.jna.Library;
+import com.sun.jna.Native;
 import com.sun.jna.Structure;
 
+/**
+ * CLibrary maps the standard C library to a Java interface through JNA.
+ * <p>
+ * Java Native Access (JNA) provides simplified access to native library methods
+ * without requiring any additional JNI or native code. Function names are
+ * mapped directly from their Java interface name to the symbol exported by the
+ * native library.
+ * 
+ * @author vianello
+ *
+ */
 public interface CLibrary extends Library {
 
-	/* struct dqblk from quota.h */
+	CLibrary INSTANCE = (CLibrary) Native.loadLibrary("c", CLibrary.class);
+
+	/**
+	 * T_dqblk is the correspondent of the dqblk structure defined in
+	 * sys/quota.h and returned by reference as addr field after quotactl()
+	 * call with Q_GETQUOTA:
+	 * 
+     * <pre>{@code	 
+     struct dqblk {@literal {}
+	    uint64_t dqb_bhardlimit;   // absolute limit on disk quota blocks alloc
+	    uint64_t dqb_bsoftlimit;   // preferred limit on disk quota blocks
+	    uint64_t dqb_curspace;     // current quota block count
+	    uint64_t dqb_ihardlimit;   // maximum number of allocated inodes
+	    uint64_t dqb_isoftlimit;   // preferred inode limit
+	    uint64_t dqb_curinodes;    // current number of allocated inodes
+	    uint64_t dqb_btime;        // time limit for excessive disk use
+	    uint64_t dqb_itime;        // time limit for excessive files
+	    uint32_t dqb_valid;        // bit mask of QIF_* constants
+	 {@literal }};
+	 * }</pre>
+	 *
+	 */
 	class T_dqblk extends Structure implements Structure.ByReference {
 
 		public long dqb_bhardlimit;
@@ -22,12 +55,22 @@ public interface CLibrary extends Library {
 		public long dqb_itime;
 		public int dqb_valid;
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.sun.jna.Structure#getFieldOrder()
+		 */
 		@Override
 		protected List<String> getFieldOrder() {
 			return Arrays.asList(new String[] { "dqb_bhardlimit", "dqb_bsoftlimit", "dqb_curspace", "dqb_ihardlimit",
 					"dqb_isoftlimit", "dqb_curinodes", "dqb_btime", "dqb_itime", "dqb_valid" });
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.sun.jna.Structure#toString()
+		 */
 		@Override
 		public String toString() {
 			return "T_dqblk [dqb_bhardlimit=" + dqb_bhardlimit + ", dqb_bsoftlimit=" + dqb_bsoftlimit
@@ -36,54 +79,48 @@ public interface CLibrary extends Library {
 					+ dqb_itime + ", dqb_valid=" + Integer.toBinaryString(dqb_valid) + "]";
 		}
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			result = prime * result + (int) (dqb_bhardlimit ^ (dqb_bhardlimit >>> 32));
-			result = prime * result + (int) (dqb_bsoftlimit ^ (dqb_bsoftlimit >>> 32));
-			result = prime * result + (int) (dqb_btime ^ (dqb_btime >>> 32));
-			result = prime * result + (int) (dqb_curinodes ^ (dqb_curinodes >>> 32));
-			result = prime * result + (int) (dqb_curspace ^ (dqb_curspace >>> 32));
-			result = prime * result + (int) (dqb_ihardlimit ^ (dqb_ihardlimit >>> 32));
-			result = prime * result + (int) (dqb_isoftlimit ^ (dqb_isoftlimit >>> 32));
-			result = prime * result + (int) (dqb_itime ^ (dqb_itime >>> 32));
-			result = prime * result + dqb_valid;
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (!super.equals(obj))
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			T_dqblk other = (T_dqblk) obj;
-			if (dqb_bhardlimit != other.dqb_bhardlimit)
-				return false;
-			if (dqb_bsoftlimit != other.dqb_bsoftlimit)
-				return false;
-			if (dqb_btime != other.dqb_btime)
-				return false;
-			if (dqb_curinodes != other.dqb_curinodes)
-				return false;
-			if (dqb_curspace != other.dqb_curspace)
-				return false;
-			if (dqb_ihardlimit != other.dqb_ihardlimit)
-				return false;
-			if (dqb_isoftlimit != other.dqb_isoftlimit)
-				return false;
-			if (dqb_itime != other.dqb_itime)
-				return false;
-			if (dqb_valid != other.dqb_valid)
-				return false;
-			return true;
-		}	
-		
 	};
 
-	/* quotactl method from quota.h */
+	/**
+	 * 
+	 * The correspondent quotactl() method from sys/quota.h
+	 * <p>
+	 * {@code int quotactl(int cmd, const char *special, int id, caddr_t addr); }
+	 * <p>
+	 * The quotactl() call manipulates disk quotas. The cmd argument indicates a
+	 * command to be applied to the user or group ID specified in id. To
+	 * initialize the cmd argument, use the QCMD(subcmd, type) macro. The type
+	 * value is either USRQUOTA, for user quotas, or GRPQUOTA, for group quotas.
+	 * The subcmd value is described below.
+	 * 
+	 * The special argument is a pointer to a null-terminated string containing
+	 * the pathname of the (mounted) block special device for the filesystem
+	 * being manipulated.
+	 * 
+	 * The addr argument is the address of an optional, command-specific, data
+	 * structure that is copied in or out of the system. The interpretation of
+	 * addr is given with each command below.
+	 * 
+	 * The subcmd value is one of the following:
+	 * <ul>
+	 * <li><b>Q_QUOTAON</b> Turn on quotas for a filesystem.</li>
+	 * <li><b>Q_QUOTAOFF</b> Turn off quotas for a filesystem.</li>
+	 * <li><b>Q_GETQUOTA</b> Get disk quota limits and current usage for user or group id.</li>
+	 * <li><b>Q_SETQUOTA</b> Set quota information for user or group id.</li>
+	 * <li><b>Q_GETINFO</b> Get information (like grace times) about quotafile.</li>
+	 * <li><b>Q_SETINFO</b> Set information about quotafile.</li>
+	 * <li><b>Q_GETFMT</b> Get quota format used on the specified filesystem.</li>
+	 * <li><b>Q_SYNC</b> Update the on-disk copy of quota usages for a filesystem.</li>
+	 * <li><b>Q_GETSTATS</b> Get statistics and other generic information about the quota
+	 * subsystem.</li>
+	 * </ul>
+	 * 
+	 * @param cmd An unique identifier of the pair (subcmd,type)
+	 * @param special The pathname of the (mounted) block special device for the filesystem being manipulated
+	 * @param id User or group id
+	 * @param addr An optional command-specific data structure
+	 * @return The exit code
+	 * @throws LastErrorException Exception representing a non-zero error code returned.
+	 */
 	int quotactl(int cmd, String special, int id, Structure addr) throws LastErrorException;
 }

@@ -51,7 +51,7 @@ public class PosixQuotaManagerTest {
 				mockedCLib.quotactl(any(Integer.class), any(String.class), any(Integer.class), any(Structure.class)))
 				.thenThrow(e);
 		try {
-			setFinalStatic(PosixQuotaManager.class.getDeclaredField("cLib"), mockedCLib);
+			setFinalStatic(CLibrary.class.getDeclaredField("INSTANCE"), mockedCLib);
 		} catch (Throwable t) {
 			t.printStackTrace();
 			fail(t.getMessage());

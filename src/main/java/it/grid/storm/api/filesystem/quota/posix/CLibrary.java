@@ -26,33 +26,49 @@ public interface CLibrary extends Library {
 	/**
 	 * T_dqblk is the correspondent of the dqblk structure defined in
 	 * sys/quota.h and returned by reference as addr field after quotactl()
-	 * call with Q_GETQUOTA:
-	 * 
-     * <pre>{@code	 
-     struct dqblk {@literal {}
-	    uint64_t dqb_bhardlimit;   // absolute limit on disk quota blocks alloc
-	    uint64_t dqb_bsoftlimit;   // preferred limit on disk quota blocks
-	    uint64_t dqb_curspace;     // current quota block count
-	    uint64_t dqb_ihardlimit;   // maximum number of allocated inodes
-	    uint64_t dqb_isoftlimit;   // preferred inode limit
-	    uint64_t dqb_curinodes;    // current number of allocated inodes
-	    uint64_t dqb_btime;        // time limit for excessive disk use
-	    uint64_t dqb_itime;        // time limit for excessive files
-	    uint32_t dqb_valid;        // bit mask of QIF_* constants
-	 {@literal }};
-	 * }</pre>
+	 * call with Q_GETQUOTA.
+	 *
+	 * @author Enrico Vianello
 	 *
 	 */
 	class T_dqblk extends Structure implements Structure.ByReference {
 
+		/**
+		 * The absolute limit on disk quota blocks allocation.
+		 */
 		public long dqb_bhardlimit;
+		
+		/**
+		 * The preferred limit on disk quota blocks.
+		 */
 		public long dqb_bsoftlimit;
+		/**
+		 * The current quota block count.
+		 */
 		public long dqb_curspace;
+		/**
+		 * The maximum number of allocated inodes.
+		 */
 		public long dqb_ihardlimit;
+		/**
+		 * The preferred inode limit.
+		 */
 		public long dqb_isoftlimit;
+		/**
+		 * The current number of allocated inodes.
+		 */
 		public long dqb_curinodes;
+		/**
+		 * The time limit for excessive disk use.
+		 */
 		public long dqb_btime;
+		/**
+		 * The time limit for excessive files.
+		 */
 		public long dqb_itime;
+		/**
+		 * The bit mask of QIF_* constants
+		 */
 		public int dqb_valid;
 
 		/*
@@ -82,13 +98,11 @@ public interface CLibrary extends Library {
 	};
 
 	/**
-	 * 
-	 * The correspondent quotactl() method from sys/quota.h
+	 * The standard C library quotactl() method from sys/quota.h which manipulates disk quotas. 
 	 * <p>
 	 * {@code int quotactl(int cmd, const char *special, int id, caddr_t addr); }
 	 * <p>
-	 * The quotactl() call manipulates disk quotas. The cmd argument indicates a
-	 * command to be applied to the user or group ID specified in id. To
+	 * The cmd argument indicates a command to be applied to the user or group ID specified in id. To
 	 * initialize the cmd argument, use the QCMD(subcmd, type) macro. The type
 	 * value is either USRQUOTA, for user quotas, or GRPQUOTA, for group quotas.
 	 * The subcmd value is described below.

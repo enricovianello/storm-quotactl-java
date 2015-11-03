@@ -9,14 +9,14 @@ import it.grid.storm.api.filesystem.quota.posix.CLibrary.T_dqblk;;
 
 /**
  * 
- * PosixQuotaManager purpose is to allow access/modify the quota information on
- * a Posix filesystem. Quotas allow you to control disk usage by user or by
- * group. Quotas prevent individual users and groups from using a larger portion
- * of a filesystem than they are permitted, or from filling it up altogether.
+ * PosixQuotaManager allows to access/modify the quota information on a Posix
+ * filesystem. Quotas allow you to control disk usage by user or by group.
+ * Quotas prevent individual users and groups from using a larger portion of a
+ * filesystem than they are permitted, or from filling it up altogether.
  * <p>
  * The quotactl() standard C library is called to manipulate disk quotas.
  * 
- * @author vianello
+ * @author Enrico Vianello
  * 
  */
 public class PosixQuotaManager {
@@ -42,8 +42,12 @@ public class PosixQuotaManager {
 	private static int GETGROUPQUOTA_CMD = 0x80000701;
 
 	/**
+	 * In case quotactl exits with a non-zero value, each error code has a
+	 * correspondent message, returned by this method.
+	 * 
 	 * @param errNo
-	 * @return
+	 *            The error code
+	 * @return The error message related to the errno specified.
 	 */
 	private String getErrnoMsg(int errNo) {
 
@@ -75,8 +79,8 @@ public class PosixQuotaManager {
 	}
 
 	/**
-	 * Call quotactl() to retrieve disk quota limits and current usage for a group id.
-	 * The ret argument is a pointer to a dqblk structure defined in
+	 * Call quotactl() to retrieve disk quota limits and current usage for a
+	 * group id. The returned argument is a pointer to a dqblk structure defined in
 	 * sys/quota.h as follows:
 	 * 
 	 * <pre>
@@ -119,12 +123,16 @@ public class PosixQuotaManager {
 	 * field. Unprivileged users may retrieve only their own quotas; a
 	 * privileged user (CAP_SYS_ADMIN) can retrieve the quotas of any user.
 	 * 
-	 * 
-	 * 
-	 * @param blockDevice The pathname of the (mounted) block special device for the filesystem being manipulated
-	 * @param gid The group id
-	 * @return PosixQuotaInfo The disk quota limits and current usage for the specified group id.
-	 * @throws PosixQuotaException Exception representing the problem occurred retrieving the quota information.
+	 * @param blockDevice
+	 *            The pathname of the (mounted) block special device for the
+	 *            filesystem being manipulated
+	 * @param gid
+	 *            The group id
+	 * @return PosixQuotaInfo The disk quota limits and current usage for the
+	 *         specified group id.
+	 * @throws PosixQuotaException
+	 *             Exception representing the problem occurred retrieving the
+	 *             quota information.
 	 */
 	public PosixQuotaInfo getGroupQuota(String blockDevice, int gid) throws PosixQuotaException {
 

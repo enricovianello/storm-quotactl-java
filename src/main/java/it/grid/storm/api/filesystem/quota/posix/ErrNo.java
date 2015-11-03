@@ -1,5 +1,12 @@
 package it.grid.storm.api.filesystem.quota.posix;
 
+/**
+ * ErrNo interface maps some of the error codes contained into the standard C
+ * library sys/errno.h
+ * 
+ * @author Enrico Vianello
+ *
+ */
 public interface ErrNo {
 
 	/* Error codes from errno.h */

@@ -119,15 +119,15 @@ public class PosixQuotaManagerLocalTest {
 	
 	@Test
 	@Category(LocalTests.class)
-	public void testLocalFailureENOENT() throws NoSuchFieldException, SecurityException, Exception {
+	public void testLocalFailureENODEV() throws NoSuchFieldException, SecurityException, Exception {
 
 		String blockdevice = FAKE_BLOCKDEVICE;
 		int gid = 1002;
 
 		log.debug("{} test on block device {} with gid {} expecting {}", 
-				"testLocalFailureENODEV", blockdevice, gid, ErrNo.ENOENT);
+				"testLocalFailureENODEV", blockdevice, gid, ErrNo.ENODEV);
 		
-		checkQuotactlFailWith(blockdevice, gid, ErrNo.ENOENT);
+		checkQuotactlFailWith(blockdevice, gid, ErrNo.ENODEV);
 	}
 
 }

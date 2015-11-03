@@ -1,0 +1,21 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.box = "centos/7"
+
+  config.vm.hostname = "centos7-quotatest.cnaf.infn.it"
+  
+  config.vm.provision "shell", path: "init.sh"
+  
+  config.vm.provider :virtualbox do |vb|
+  
+    vb.customize ["createhd", "--filename", "test-vo.vdi", "--size", 2000 * 1024]
+    vb.customize ["storageattach", :id, "--storagectl", "IDE Controller", "--port", 1, "--device", 0, "--type", "hdd", "--medium", "test-vo.vdi"]
+    
+  end
+
+end

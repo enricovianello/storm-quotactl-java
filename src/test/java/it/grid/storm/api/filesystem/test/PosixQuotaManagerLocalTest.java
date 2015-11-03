@@ -26,7 +26,7 @@ public class PosixQuotaManagerLocalTest {
 
 	private static final Logger log = LoggerFactory.getLogger(PosixQuotaManagerLocalTest.class);
 
-	private static String BLOCKDEVICE = "/dev/sdb1";
+	private static String BLOCKDEVICE = "/dev/sdb";
 	private static String MOUNTPOINT = "/storage/test.vo";
 	private static int GID = 1003;
 	private static int BLOCKHARDLIMIT = 1000;

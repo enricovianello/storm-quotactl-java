@@ -2,6 +2,8 @@ package it.grid.storm.api.filesystem.test;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -24,6 +26,11 @@ public class PosixQuotaManagerLocalTest {
 
 	private static final Logger log = LoggerFactory.getLogger(PosixQuotaManagerLocalTest.class);
 
+	private static String BLOCKDEVICE = "/dev/sdb1";
+	private static String MOUNTPOINT = "/storage/test.vo";
+	private static int GID = 1003;
+	private static int BLOCKHARDLIMIT = 1000;
+	
 	private static String FAKE_BLOCKDEVICE = "/dev/fake";
 	private static int FAKE_GID = 1000;
 
@@ -92,15 +99,15 @@ public class PosixQuotaManagerLocalTest {
 	@Category(LocalTests.class)
 	public void testLocalSuccess() throws NoSuchFieldException, SecurityException, Exception {
 
-		String blockdevice = "/dev/sdb";
-		int gid = 1002;
+		String blockdevice = BLOCKDEVICE;
+		int gid = GID;
 
 		log.debug("{} test on block device {} with gid {} expecting {}", 
 				"testLocalSuccess", blockdevice, gid, "success");
 		
 		PosixQuotaInfo pqi = checkQuotactlSuccess(blockdevice, gid);
 		
-		assertTrue(pqi.getBlockHardLimit() == 1000);
+		assertTrue(pqi.getBlockHardLimit() == BLOCKHARDLIMIT);
 		assertTrue(pqi.getValid() == PosixQuotaInfo.QIF_ALL);
 	}
 	
@@ -108,7 +115,7 @@ public class PosixQuotaManagerLocalTest {
 	@Category(LocalTests.class)
 	public void testLocalFailureEPERM() throws NoSuchFieldException, SecurityException, Exception {
 
-		String blockdevice = "/dev/sdb";
+		String blockdevice = BLOCKDEVICE;
 		int gid = FAKE_GID;
 
 		log.debug("{} test on block device {} with gid {} expecting {}", 
@@ -122,12 +129,42 @@ public class PosixQuotaManagerLocalTest {
 	public void testLocalFailureENOENT() throws NoSuchFieldException, SecurityException, Exception {
 
 		String blockdevice = FAKE_BLOCKDEVICE;
-		int gid = 1002;
+		int gid = GID;
 
 		log.debug("{} test on block device {} with gid {} expecting {}", 
 				"testLocalFailureENOENT", blockdevice, gid, ErrNo.ENOENT);
 		
 		checkQuotactlFailWith(blockdevice, gid, ErrNo.ENOENT);
+	}
+	
+	@Test
+	@Category(LocalTests.class)
+	public void testExceedBlockHardLimit() throws NoSuchFieldException, SecurityException, Exception {
+
+		String blockdevice = BLOCKDEVICE;
+		int gid = GID;
+
+		log.debug("{} test on block device {} with gid {} expecting {}", "testExceedBlockHardLimit", blockdevice, gid,
+				"success");
+
+		String filename = MOUNTPOINT + "/test.txt";
+		log.debug("Create filename {}", filename);
+		
+		FileOutputStream s = new FileOutputStream(filename);		
+		try {
+			
+			byte[] buf = new byte[1024*1024];
+			s.write(buf);
+			s.flush();
+			
+			fail("You must NOT be here!");
+		} catch (Exception e) {
+			System.err.println(e);
+		} finally {
+			s.close();
+			File f = new File(filename);
+			f.delete();
+		}
 	}
 
 }

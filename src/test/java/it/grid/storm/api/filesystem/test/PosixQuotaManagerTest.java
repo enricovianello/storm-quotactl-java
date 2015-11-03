@@ -99,6 +99,9 @@ public class PosixQuotaManagerTest {
 		String blockdevice = "/dev/sdb";
 		int gid = 1002;
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testLocalSuccess", blockdevice, gid, "success");
+		
 		PosixQuotaInfo pqi = checkQuotactlSuccess(new PosixQuotaManager(), blockdevice, gid);
 		
 		assertTrue(pqi.getBlockHardLimit() == 1000);
@@ -112,6 +115,9 @@ public class PosixQuotaManagerTest {
 		String blockdevice = "/dev/sdb";
 		int gid = 1000;
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testLocalFailureEPERM", blockdevice, gid, ErrNo.EPERM);
+		
 		checkQuotactlFailWith(new PosixQuotaManager(), blockdevice, gid, ErrNo.EPERM);
 	}
 	
@@ -122,6 +128,9 @@ public class PosixQuotaManagerTest {
 		String blockdevice = FAKE_BLOCKDEVICE;
 		int gid = 1002;
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testLocalFailureENODEV", blockdevice, gid, ErrNo.ENODEV);
+		
 		checkQuotactlFailWith(new PosixQuotaManager(), blockdevice, gid, ErrNo.ENODEV);
 	}
 
@@ -129,6 +138,9 @@ public class PosixQuotaManagerTest {
 	@Category(MockedTests.class)
 	public void testEFAULT() throws NoSuchFieldException, SecurityException, Exception {
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testEFAULT", FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EFAULT);
+		
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EFAULT);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EFAULT);
 	}
@@ -137,6 +149,9 @@ public class PosixQuotaManagerTest {
 	@Category(MockedTests.class)
 	public void testEINVAL() throws NoSuchFieldException, SecurityException, Exception {
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testEINVAL", FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EINVAL);
+		
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EINVAL);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EINVAL);
 	}
@@ -145,6 +160,9 @@ public class PosixQuotaManagerTest {
 	@Category(MockedTests.class)
 	public void testENOENT() throws NoSuchFieldException, SecurityException, Exception {
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testENOENT", FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENOENT);
+		
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ENOENT);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENOENT);
 	}
@@ -153,6 +171,9 @@ public class PosixQuotaManagerTest {
 	@Category(MockedTests.class)
 	public void testENOSYS() throws NoSuchFieldException, SecurityException, Exception {
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testENOSYS", FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENOSYS);
+		
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ENOSYS);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENOSYS);
 	}
@@ -161,6 +182,9 @@ public class PosixQuotaManagerTest {
 	@Category(MockedTests.class)
 	public void testENOTBLK() throws NoSuchFieldException, SecurityException, Exception {
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testENOTBLK", FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENOTBLK);
+		
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ENOTBLK);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENOTBLK);
 	}
@@ -169,6 +193,9 @@ public class PosixQuotaManagerTest {
 	@Category(MockedTests.class)
 	public void testEPERM() throws NoSuchFieldException, SecurityException, Exception {
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testEPERM", FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EPERM);
+		
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EPERM);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EPERM);
 	}
@@ -177,6 +204,9 @@ public class PosixQuotaManagerTest {
 	@Category(MockedTests.class)
 	public void testESRCH() throws NoSuchFieldException, SecurityException, Exception {
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testESRCH", FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ESRCH);
+		
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ESRCH);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ESRCH);
 	}
@@ -185,6 +215,9 @@ public class PosixQuotaManagerTest {
 	@Category(MockedTests.class)
 	public void testEIO() throws NoSuchFieldException, SecurityException, Exception {
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testEIO", FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EIO);
+		
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EIO);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EIO);
 	}
@@ -193,6 +226,9 @@ public class PosixQuotaManagerTest {
 	@Category(MockedTests.class)
 	public void testEMFILE() throws NoSuchFieldException, SecurityException, Exception {
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testEMFILE", FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EMFILE);
+		
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.EMFILE);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.EMFILE);
 	}
@@ -201,6 +237,9 @@ public class PosixQuotaManagerTest {
 	@Category(MockedTests.class)
 	public void testENODEV() throws NoSuchFieldException, SecurityException, Exception {
 
+		log.debug("{} test on block device {} with gid {} expecting {}", 
+				"testENODEV", FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENODEV);
+		
 		PosixQuotaManager pqm = getMockedQuotaManagerFailsWith(ErrNo.ENODEV);
 		checkQuotactlFailWith(pqm, FAKE_BLOCKDEVICE, FAKE_GID, ErrNo.ENODEV);
 	}

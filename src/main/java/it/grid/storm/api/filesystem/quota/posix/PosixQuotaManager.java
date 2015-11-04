@@ -9,7 +9,7 @@ import it.grid.storm.api.filesystem.quota.posix.CLibrary.T_dqblk;;
 
 /**
  * 
- * PosixQuotaManager allows to access/modify the quota information on a Posix
+ * PosixQuotaManager allows to access the quota information on a Posix
  * filesystem. Quotas allow you to control disk usage by user or by group.
  * Quotas prevent individual users and groups from using a larger portion of a
  * filesystem than they are permitted, or from filling it up altogether.
@@ -80,48 +80,7 @@ public class PosixQuotaManager {
 
 	/**
 	 * Call quotactl() to retrieve disk quota limits and current usage for a
-	 * group id. The returned argument is a pointer to a dqblk structure defined in
-	 * sys/quota.h as follows:
-	 * 
-	 * <pre>
-	 * {@code
-	 * struct dqblk {
-	 *   uint64_t dqb_bhardlimit;   // absolute limit on disk quota blocks alloc
-	 *   uint64_t dqb_bsoftlimit;   // preferred limit on disk quota blocks
-	 *   uint64_t dqb_curspace;     // current quota block count
-	 *   uint64_t dqb_ihardlimit;   // maximum number of allocated inodes
-	 *   uint64_t dqb_isoftlimit;   // preferred inode limit
-	 *   uint64_t dqb_curinodes;    // current number of allocated inodes
-	 *   uint64_t dqb_btime;        // time limit for excessive disk use
-	 *   uint64_t dqb_itime;        // time limit for excessive files
-	 *   uint32_t dqb_valid;        // bit mask of QIF_* constants
-	 * };
-	 * }
-	 * </pre>
-	 *
-	 * Flags in dqb_valid that indicate which fields in dqblk structure are
-	 * valid:
-	 * 
-	 * <pre>
-	 * {@code
-	 * #define QIF_BLIMITS   1
-	 * #define QIF_SPACE     2
-	 * #define QIF_ILIMITS   4
-	 * #define QIF_INODES    8
-	 * #define QIF_BTIME     16
-	 * #define QIF_ITIME     32
-	 * #define QIF_LIMITS    (QIF_BLIMITS | QIF_ILIMITS)
-	 * #define QIF_USAGE     (QIF_SPACE | QIF_INODES)
-	 * #define QIF_TIMES     (QIF_BTIME | QIF_ITIME)
-	 * #define QIF_ALL       (QIF_LIMITS | QIF_USAGE | QIF_TIMES)
-	 * }
-	 * </pre>
-	 * 
-	 * The dqb_valid field is a bit mask that is set to indicate the entries in
-	 * the dqblk structure that are valid. Currently, the kernel fills in all
-	 * entries of the dqblk structure and marks them as valid in the dqb_valid
-	 * field. Unprivileged users may retrieve only their own quotas; a
-	 * privileged user (CAP_SYS_ADMIN) can retrieve the quotas of any user.
+	 * group id.
 	 * 
 	 * @param blockDevice
 	 *            The pathname of the (mounted) block special device for the

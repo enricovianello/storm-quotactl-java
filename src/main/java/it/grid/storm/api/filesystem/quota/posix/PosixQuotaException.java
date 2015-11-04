@@ -1,5 +1,7 @@
 package it.grid.storm.api.filesystem.quota.posix;
 
+import com.sun.jna.LastErrorException;
+
 /**
  * Exception raised in case of an error. In case of an error during quotactl(),
  * the cause object is an instance of {@link LastErrorException}

@@ -155,7 +155,7 @@ public class PosixQuotaManagerLocalTest {
 		try {
 			f = new RandomAccessFile(filename, "rw");
 			f.setLength(1024 * 1024 * 1024);
-			
+			fail("Creation of a big file didn't fail!!");
 		} catch (Exception e) {
 			System.err.println(e);
 		} finally {

@@ -2,8 +2,10 @@ package it.grid.storm.api.filesystem.test;
 
 import static org.junit.Assert.*;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.RandomAccessFile;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -21,6 +23,15 @@ import it.grid.storm.api.filesystem.quota.posix.ErrNo;
 import it.grid.storm.api.filesystem.quota.posix.PosixQuotaManager;
 import it.grid.storm.api.filesystem.quota.posix.PosixQuotaException;
 import it.grid.storm.api.filesystem.quota.posix.PosixQuotaInfo;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 
 public class PosixQuotaManagerLocalTest {
 
@@ -149,21 +160,37 @@ public class PosixQuotaManagerLocalTest {
 				"success");
 
 		String filename = MOUNTPOINT + "/test.txt";
-		log.debug("Create filename {}", filename);
-
-		RandomAccessFile f = null;
+		File f = new File(filename);
+		Path newFile = f.toPath();
+		Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxrw----");
+		FileAttribute<Set<PosixFilePermission>> fileAttrs = PosixFilePermissions.asFileAttribute(perms);
+		GroupPrincipal group = newFile.getFileSystem().getUserPrincipalLookupService()
+				.lookupPrincipalByGroupName("test.vo");
+		BufferedWriter bw = null;
+		
 		try {
-			f = new RandomAccessFile(filename, "rw");
-			f.setLength(1024 * 1024 * 1024);
+			log.debug("Create filename '{}' ... ", filename);
+			Files.createFile(Paths.get(filename), fileAttrs);
+			log.debug("File '{}' created!", filename);
+			Files.getFileAttributeView(newFile, PosixFileAttributeView.class).setGroup(group);
+			log.debug("File '{}' group owner changed to '{}'!", filename, group);
+			FileWriter fw = new FileWriter(f.getAbsoluteFile());
+			bw = new BufferedWriter(fw);
+			log.debug("File is going to be written ...");
+			for (long i = 0; i <= 1024 * 1024; i++) {
+				log.debug("{}", i);
+				bw.write('0');
+			}
+			bw.close();
 			fail("Creation of a big file didn't fail!!");
 		} catch (Exception e) {
-			System.err.println(e);
+			log.debug("Exception: {}", e);
+			assertTrue(e instanceof IOException);
+			assertTrue(e.getMessage().contains("Disk quota exceeded"));
 		} finally {
-			if ( f!=null ) {
-				f.close();
+			if (bw != null) {
+				bw.close();
 			}
-			File f2 = new File(filename);
-			f2.delete();
 		}
 	}
 

@@ -3,7 +3,7 @@ package it.grid.storm.api.filesystem.test;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -30,27 +30,28 @@ public class PosixQuotaManagerLocalTest {
 	private static String MOUNTPOINT = "/storage/test.vo";
 	private static int GID = 1003;
 	private static int BLOCKHARDLIMIT = 1000;
-	
+
 	private static String FAKE_BLOCKDEVICE = "/dev/fake";
 	private static int FAKE_GID = 1000;
 
 	@BeforeClass
 	public static void setUpBeforeClass() {
-		
+
 		initCLibrary();
 	}
-	
-    static void initCLibrary() {
-		
+
+	static void initCLibrary() {
+
 		try {
-			setFinalStatic(CLibrary.class.getDeclaredField("INSTANCE"), (CLibrary) Native.loadLibrary("c", CLibrary.class));
+			setFinalStatic(CLibrary.class.getDeclaredField("INSTANCE"),
+					(CLibrary) Native.loadLibrary("c", CLibrary.class));
 		} catch (Throwable t) {
 			t.printStackTrace();
 			fail(t.getMessage());
 		}
 	}
-    
-    static void setFinalStatic(Field field, Object newValue) throws Exception {
+
+	static void setFinalStatic(Field field, Object newValue) throws Exception {
 
 		field.setAccessible(true);
 		Field modifiersField = Field.class.getDeclaredField("modifiers");
@@ -78,7 +79,7 @@ public class PosixQuotaManagerLocalTest {
 	private void checkQuotactlFailWith(String blockDevice, int gid, int errNo) {
 
 		PosixQuotaManager pqm = new PosixQuotaManager();
-		
+
 		try {
 
 			pqm.getGroupQuota(blockDevice, gid);
@@ -102,15 +103,15 @@ public class PosixQuotaManagerLocalTest {
 		String blockdevice = BLOCKDEVICE;
 		int gid = GID;
 
-		log.debug("{} test on block device {} with gid {} expecting {}", 
-				"testLocalSuccess", blockdevice, gid, "success");
-		
+		log.debug("{} test on block device {} with gid {} expecting {}", "testLocalSuccess", blockdevice, gid,
+				"success");
+
 		PosixQuotaInfo pqi = checkQuotactlSuccess(blockdevice, gid);
-		
+
 		assertTrue(pqi.getBlockHardLimit() == BLOCKHARDLIMIT);
 		assertTrue(pqi.getValid() == PosixQuotaInfo.QIF_ALL);
 	}
-	
+
 	@Test
 	@Category(LocalTests.class)
 	public void testLocalFailureEPERM() throws NoSuchFieldException, SecurityException, Exception {
@@ -118,12 +119,12 @@ public class PosixQuotaManagerLocalTest {
 		String blockdevice = BLOCKDEVICE;
 		int gid = FAKE_GID;
 
-		log.debug("{} test on block device {} with gid {} expecting {}", 
-				"testLocalFailureEPERM", blockdevice, gid, ErrNo.EPERM);
-		
+		log.debug("{} test on block device {} with gid {} expecting {}", "testLocalFailureEPERM", blockdevice, gid,
+				ErrNo.EPERM);
+
 		checkQuotactlFailWith(blockdevice, gid, ErrNo.EPERM);
 	}
-	
+
 	@Test
 	@Category(LocalTests.class)
 	public void testLocalFailureENOENT() throws NoSuchFieldException, SecurityException, Exception {
@@ -131,12 +132,12 @@ public class PosixQuotaManagerLocalTest {
 		String blockdevice = FAKE_BLOCKDEVICE;
 		int gid = GID;
 
-		log.debug("{} test on block device {} with gid {} expecting {}", 
-				"testLocalFailureENOENT", blockdevice, gid, ErrNo.ENOENT);
-		
+		log.debug("{} test on block device {} with gid {} expecting {}", "testLocalFailureENOENT", blockdevice, gid,
+				ErrNo.ENOENT);
+
 		checkQuotactlFailWith(blockdevice, gid, ErrNo.ENOENT);
 	}
-	
+
 	@Test
 	@Category(LocalTests.class)
 	public void testExceedBlockHardLimit() throws NoSuchFieldException, SecurityException, Exception {
@@ -149,21 +150,20 @@ public class PosixQuotaManagerLocalTest {
 
 		String filename = MOUNTPOINT + "/test.txt";
 		log.debug("Create filename {}", filename);
-		
-		FileOutputStream s = new FileOutputStream(filename);		
+
+		RandomAccessFile f = null;
 		try {
+			f = new RandomAccessFile(filename, "rw");
+			f.setLength(1024 * 1024 * 1024);
 			
-			byte[] buf = new byte[1024*1024];
-			s.write(buf);
-			s.flush();
-			
-			fail("You must NOT be here!");
 		} catch (Exception e) {
 			System.err.println(e);
 		} finally {
-			s.close();
-			File f = new File(filename);
-			f.delete();
+			if ( f!=null ) {
+				f.close();
+			}
+			File f2 = new File(filename);
+			f2.delete();
 		}
 	}
 

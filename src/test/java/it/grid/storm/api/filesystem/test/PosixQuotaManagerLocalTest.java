@@ -178,7 +178,6 @@ public class PosixQuotaManagerLocalTest {
 			bw = new BufferedWriter(fw);
 			log.debug("File is going to be written ...");
 			for (long i = 0; i <= 1024 * 1024; i++) {
-				log.debug("{}", i);
 				bw.write('0');
 			}
 			bw.close();

@@ -183,13 +183,11 @@ public class PosixQuotaManagerLocalTest {
 			bw.close();
 			fail("Creation of a big file didn't fail!!");
 		} catch (Exception e) {
-			log.debug("Exception: {}", e);
+			log.debug("Exception: {}", e.getMessage());
 			assertTrue(e instanceof IOException);
 			assertTrue(e.getMessage().contains("Disk quota exceeded"));
 		} finally {
-			if (bw != null) {
-				bw.close();
-			}
+			f.delete();
 		}
 	}
 

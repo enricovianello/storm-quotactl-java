@@ -1,36 +1,42 @@
 #!/bin/bash
 set -e
 
+GIT_REPO_URL=$1
+GIT_REPO_BRANCH=$2
+
+echo "GIT_REPO_URL => $GIT_REPO_URL"
+echo "GIT_REPO_BRANCH => $GIT_REPO_BRANCH"
+
 filesystem="/dev/sdb"
 mountpoint="/storage/test.vo"
 user="storm"
 userid=1001
 group="test.vo"
 groupid=1003
-repo="https://github.com/enricovianello/storm-quotactl-java.git"
-branch="master"
 
 echo "hostname -f => $(hostname -f)"
 
+echo "Install necessary packages ..."
 yum -y install git maven vim-enhanced java-1.8.0-openjdk quota xfsprogs-devel glibc-headers
 
+echo "Print /etc/fstab ..."
 cat /etc/fstab
-
+echo "Print fdisk -l ..."
 fdisk -l
-
+echo "Print lsblk ..."
 lsblk
 
 echo "Check if $filesystem is mounted ..."
 if grep -qs "$filesystem" /proc/mounts; then
-  echo "$filesystem is mounted ..."
+  echo "$filesystem is mounted!"
   echo "umount $filesystem ..."
   umount $filesystem
 fi
 
+echo "wipefs -f $fielsystem ..."
 /usr/sbin/wipefs -f $filesystem
+echo "mke2fs -F -t ext4 $filesystem ..."
 /usr/sbin/mke2fs -F -t ext4 $filesystem
-
-cat /etc/fstab
 
 # users and groups
 
@@ -48,7 +54,7 @@ chown $user:$group /home/$user/.m2
 cp /home/vagrant/sync/files/settings.xml /home/$user/.m2/settings.xml
 
 echo "Create '$mountpoint' directory ..."
-mkdir -p /storage/test.vo || echo "Directory already exists."
+mkdir -p $mountpoint || echo "Directory already exists."
 
 if grep "$filesystem" /etc/fstab; then
   echo "No need to add rows to /etc/fstab ..."
@@ -88,11 +94,13 @@ echo "Report $filesystem quota ..."
 repquota -vsig $mountpoint
 
 if ls /home/$user/storm-quotactl-java; then
-  cmd="cd storm-quotactl-java && git pull && mvn test -P includeLocalTests"
+  echo "git repo mounted from local ..."
+  cmd="cd storm-quotactl-java && mvn test -P includeLocalTests"
 else
-  cmd="git clone $repo && cd storm-quotactl-java && git checkout $branch && mvn test -P includeLocalTests"
+  echo "git repo will be cloned from $GIT_REPO_URL, branch: $GIT_REPO_BRANCH"
+  cmd="git clone $GIT_REPO_URL && cd storm-quotactl-java && git checkout $GIT_REPO_BRANCH && mvn test -P includeLocalTests"
 fi
 
-su - "storm" -c "whoami; id; $cmd"
+su - "$user" -c "whoami; id; $cmd"
 
 echo "finished"

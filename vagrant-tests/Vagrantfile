@@ -1,15 +1,33 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-VAGRANTFILE_API_VERSION = "2"
+require 'fileutils'
 
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+CONFIG = File.join(File.dirname(__FILE__), "config.rb")
+
+# Defaults for config options defined in CONFIG
+$git_repo_url = "https://github.com/enricovianello/storm-quotactl-java.git"
+$git_repo_branch = "master"
+$git_is_local = false
+
+if File.exist?(CONFIG)
+  require CONFIG
+end
+
+STORM_QUOTACTL_DIR = ENV['HOME'] + '/git/storm-quotactl-java'
+VAGRANT_QUOTACTL_DIR = '/home/storm/storm-quotactl-java'
+
+Vagrant.configure("2") do |config|
 
   config.vm.box = "centos/7"
 
   config.vm.hostname = "centos7-quotatest.cnaf.infn.it"
-    
-  config.vm.provision "shell", path: "init.sh"
+  
+  config.vm.provision "shell", path: "init.sh", :args => "#{$git_repo_url} #{$git_repo_branch}"
+  
+  if $git_is_local
+    config.vm.synced_folder STORM_QUOTACTL_DIR, VAGRANT_QUOTACTL_DIR, id: "storm", :mount_options => ['uid=1001,gid=1001']
+  end
   
   config.vm.provider :virtualbox do |vb|
     

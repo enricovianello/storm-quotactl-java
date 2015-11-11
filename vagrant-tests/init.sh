@@ -13,6 +13,7 @@ user="storm"
 userid=1001
 group="test.vo"
 groupid=1003
+bhardlimit=10000
 
 echo "hostname -f => $(hostname -f)"
 
@@ -88,7 +89,7 @@ quotacheck -avugm
 quotaon -avug
 
 echo "Setting block hard limit to 1000 ..."
-setquota -g $group 0 1000 0 0 $filesystem
+setquota -g $group 0 $bhardlimit 0 0 $filesystem
 
 echo "Report $filesystem quota ..."
 repquota -vsig $mountpoint

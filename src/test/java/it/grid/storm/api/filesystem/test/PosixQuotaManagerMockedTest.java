@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.jna.LastErrorException;
+import com.sun.jna.Native;
 import com.sun.jna.Structure;
 
 import it.grid.storm.api.filesystem.quota.posix.CLibrary;
@@ -26,6 +28,23 @@ public class PosixQuotaManagerMockedTest {
 
 	private static String FAKE_BLOCKDEVICE = "/dev/fake";
 	private static int FAKE_GID = 1000;
+	
+	@AfterClass
+	public static void setUpBeforeClass() {
+
+		restoreCLibrary();
+	}
+
+	static void restoreCLibrary() {
+
+		try {
+			setFinalStatic(CLibrary.class.getDeclaredField("INSTANCE"),
+					(CLibrary) Native.loadLibrary("c", CLibrary.class));
+		} catch (Throwable t) {
+			t.printStackTrace();
+			fail(t.getMessage());
+		}
+	}
 	
 	static void initMockedCLibraryFailsWith(int errNo) {
 		

@@ -11,6 +11,8 @@
 	
 		<!-- versions of the project dependencies -->
 		<jna.version>4.2.1</jna.version>
+		
+		<!-- versions of the project dependencies [test]-->
 		<junit.version>4.8.1</junit.version>
 		<mockito.version>1.9.5</mockito.version>
 		<slf4j.version>1.7.12</slf4j.version>
@@ -38,7 +40,7 @@
 	<profiles>
 		<!-- Default: exclude tests on local filesystem -->
 		<profile>
-			<id>excludeLocalTests</id>
+			<id>mockedTests</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
@@ -47,26 +49,20 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>includeLocalTests</id>
-			<properties>
-				<test.categories>it.grid.storm.api.filesystem.test.LocalTests,it.grid.storm.api.filesystem.test.MockedTests</test.categories>
-			</properties>
-		</profile>
+            <id>all</id>
+            <properties>
+                <test.categories>it.grid.storm.api.filesystem.test.LocalTests,it.grid.storm.api.filesystem.test.MockedTests</test.categories>
+            </properties>
+        </profile>
+		<profile>
+            <id>localTests</id>
+            <properties>
+                <test.categories>it.grid.storm.api.filesystem.test.LocalTests</test.categories>
+            </properties>
+        </profile>
 	</profiles>
 	<dependencies>
 	
-		<!-- Logging dependencies -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>${logback.version}</version>
-		</dependency>
-		
 		<!-- Core dependencies -->
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
@@ -75,6 +71,18 @@
 		</dependency>
 		
 		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>

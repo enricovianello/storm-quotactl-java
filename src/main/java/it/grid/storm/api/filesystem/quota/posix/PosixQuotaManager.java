@@ -1,8 +1,5 @@
 package it.grid.storm.api.filesystem.quota.posix;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sun.jna.LastErrorException;
 
 import it.grid.storm.api.filesystem.quota.posix.CLibrary.T_dqblk;;
@@ -20,8 +17,6 @@ import it.grid.storm.api.filesystem.quota.posix.CLibrary.T_dqblk;;
  * 
  */
 public class PosixQuotaManager {
-
-	private static final Logger log = LoggerFactory.getLogger(PosixQuotaManager.class);
 
 	/**
 	 * The result of the QCMD(subcmd, type) macro defined into sys/quota.h,
@@ -95,22 +90,18 @@ public class PosixQuotaManager {
 	 */
 	public PosixQuotaInfo getGroupQuota(String blockDevice, int gid) throws PosixQuotaException {
 
-		log.debug("PosixQuotaManager.getGroupQuota({},{})", blockDevice, gid);
 		T_dqblk dablk = new T_dqblk();
-		int res;
+
 		try {
 
-			log.debug("quotactl({},{},{}) ...", Integer.toHexString(GETGROUPQUOTA_CMD), blockDevice, gid);
-			res = CLibrary.INSTANCE.quotactl(GETGROUPQUOTA_CMD, blockDevice, gid, dablk);
-			log.debug("quotactl exited with {} and returned {}", res, dablk.toString());
+			CLibrary.INSTANCE.quotactl(GETGROUPQUOTA_CMD, blockDevice, gid, dablk);
 
 		} catch (LastErrorException e) {
 
-			int errNo = e.getErrorCode();
-			String errMsg = getErrnoMsg(e.getErrorCode());
-			String message = String.format("Unable to load quota information for device %s and gid %d: [%d] %s",
-					blockDevice, gid, errNo, errMsg);
-			throw new PosixQuotaException(message, e);
+			throw new PosixQuotaException(
+					String.format("Unable to load quota information for device %s and gid %d: [%d] %s", blockDevice,
+							gid, e.getErrorCode(), getErrnoMsg(e.getErrorCode())),
+					e);
 		}
 
 		return new PosixQuotaInfo(dablk);

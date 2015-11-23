@@ -23,7 +23,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.hostname = "centos7-quotatest.cnaf.infn.it"
   
-  config.vm.provision "shell", path: "init.sh", :args => "#{$git_repo_url} #{$git_repo_branch}"
+  config.vm.provision "shell", path: "setup.sh"
+  config.vm.provision "shell", path: "init.sh", :args => "#{$git_is_local} #{$git_repo_url} #{$git_repo_branch}"
   
   if $git_is_local
     config.vm.synced_folder STORM_QUOTACTL_DIR, VAGRANT_QUOTACTL_DIR, id: "storm", :mount_options => ['uid=1001,gid=1001']
